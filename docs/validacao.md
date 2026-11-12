@@ -38,7 +38,7 @@ de teste em SSD com backup e autorização específica.
   para a mesma cena local, com o mesmo ponto de início e fim.
 - Faça pelo menos três rodadas por condição, mantendo a versão do
   Windows, espaço de jogo, energia e atualizações equivalentes.
-  Compare as medianas de boot e carregamento. Use
+  Use Compare-BnqqOSCompactTrial.ps1 para as medianas e deltas de todas as rodadas. Use
   Compare-BnqqOSBaseline.ps1 -SameVm para os deltas de repouso de cada par.
 - Confira o texto de CompactQuery de cada relatório antes de comparar.
   Use o WPR quando precisar atribuir uma diferença de boot a CPU ou disco.
