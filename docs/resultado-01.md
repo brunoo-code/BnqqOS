@@ -45,3 +45,10 @@ pelo DVD BNQQ_POWER_QA. A opção 0 ativou o perfil derivado do BNQQ
 Competitive original e o menu 31 restaurou o plano ativo anterior.
 O teste verificou ativação e restauração. Não incluiu medição de FPS,
 temperatura ou consumo elétrico.
+
+### ISO com o plano BNQQ Competitive validado
+
+- ISO: C:\Users\bruno\Documents\BnqqOS-Lab\build-power-7e24e05\BnqqOS.iso (8518608896 bytes).
+- SHA-256 da ISO: 2FBDF340E41F75010275468943B746974BA57F0771CF915993EB247448CC5881.
+- SHA-256 do Toolkit testado na VM e confirmado na imagem: 1341D4A9BB1E46B1BE013303F3183B2A9D0561688085AAC43253D528D034E941.
+- A ISO inclui o commit 7e24e05 do Toolkit e preserva o modo de cores padrão do Windows. O ajuste do OneDrive está no commit separado 2c238b0 e ainda não faz parte desta ISO.
