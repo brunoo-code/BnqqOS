@@ -65,14 +65,14 @@ try {
     $imageName = "BnqqOS $($Edition -replace '^Windows 11', 'Win11') $release"
     $wim = Join-Path $run 'install.wim'
     Export-WindowsImage -SourceImagePath $install[0].FullName -SourceIndex $image[0].ImageIndex -DestinationImagePath $wim -DestinationName $imageName -CompressionType Max -CheckIntegrity | Out-Null
-    $exportedImages = @(Get-WindowsImage -ImagePath $wim)
-    if ($exportedImages.Count -ne 1 -or $exportedImages[0].ImageName -ne $imageName) {
-        throw 'The exported WIM does not contain the expected single image.'
-    }
-    $exportedImage = Get-WindowsImage -ImagePath $wim -Index 1
-    if ($sourceImage.EditionId -and $exportedImage.EditionId -and
-        $exportedImage.EditionId -ne $sourceImage.EditionId) {
-        throw 'The exported Windows edition differs from the source.'
+    $readMetadata = Join-Path $PSScriptRoot 'Get-BnqqOSWimMetadata.ps1'
+    $sourceMetadata = @(& $readMetadata -Path $install[0].FullName | Where-Object Index -eq $image[0].ImageIndex)
+    $exportedImages = @(& $readMetadata -Path $wim)
+    if ($sourceMetadata.Count -ne 1 -or -not $sourceMetadata[0].EditionId -or
+        $exportedImages.Count -ne 1 -or $exportedImages[0].Index -ne 1 -or
+        $exportedImages[0].Name -ne $imageName -or
+        $exportedImages[0].EditionId -ne $sourceMetadata[0].EditionId) {
+        throw 'The exported image index, name or Windows edition did not match.'
     }
     Remove-Item -LiteralPath $install[0].FullName -Force
 
@@ -131,7 +131,7 @@ try {
     [ordered]@{
         DefaultColorMode = 'Dark'
         Edition = $Edition
-        ImageName = $exportedImages[0].ImageName
+        ImageName = $exportedImages[0].Name
         SourceIndex = $image[0].ImageIndex
         SourceIsoSha256 = $sourceHash
         BnqqOsIsoSha256 = (Get-FileHash -LiteralPath $bnqqIso -Algorithm SHA256).Hash
