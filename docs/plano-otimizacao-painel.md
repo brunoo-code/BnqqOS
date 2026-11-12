@@ -30,3 +30,22 @@ de segundo plano devem ter aplicação e restauração próprias.
 O DVD `BNQQ_APPS_QA` foi anexado à VM `BnqqOS-Teste`. O teste real
 depende da execução de `Run BNQQ Option 0.cmd` dentro da sessão da VM.
 Nenhuma remoção real foi registrada até esta atualização.
+
+## Execução real da opção 0 na BnqqOS-Teste
+
+Fonte: saída do console fornecida pelo operador da VM. A etapa de
+remoção confirmou sete apps retirados da conta atual: hub do Microsoft
+365, novo Outlook, Gravador de Voz, Hub de Feedback, Dev Home, To Do
+e Power Automate Desktop. Copilot, Clipchamp, Notícias, Clima e Solitaire
+estavam ausentes. Recall estava ausente ou desativado.
+
+A execução confirmou Alto desempenho, Apps Lite, aceleração de ponteiro
+desligada e SysMain, Telefonia e Serviço de Telefone desativados.
+MapsBroker foi ignorado. A única etapa com pendência foi Widgets, com
+erro de acesso. A captura estava marcada como ativa. OneDrive, seu
+instalador e a inicialização automática do Edge apareceram no inventário,
+junto à notificação de segurança do Windows.
+
+A manutenção reportou 37,29 GB usados e 41,61 GB livres no volume virtual.
+O retrim e a consolidação reportaram zero bytes recuperados. Este log
+não contém um baseline pareado de RAM, CPU ou disco.
