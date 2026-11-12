@@ -1,25 +1,58 @@
-param([ValidateRange(10,300)][int]$Seconds = 60)
+param([ValidateRange(10,300)][int]$Seconds = 60,[switch]$ShowProgress)
 $ErrorActionPreference = 'Stop'
-$os = Get-CimInstance Win32_OperatingSystem
+$os = Get-CimInstance Win32_OperatingSystem -OperationTimeoutSec 10
 $version = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
-$disk = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='$($os.SystemDrive)'"
-$computer = Get-CimInstance Win32_ComputerSystem
+$disk = Get-CimInstance Win32_LogicalDisk -OperationTimeoutSec 10 -Filter "DeviceID='$($os.SystemDrive)'"
+$computer = Get-CimInstance Win32_ComputerSystem -OperationTimeoutSec 10
 $theme = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -ErrorAction SilentlyContinue
 $windowsOld = Test-Path -LiteralPath (Join-Path "$($os.SystemDrive)\" 'Windows.old')
-$samples = @(for ($i = 0; $i -lt $Seconds; $i++) {
-    $cpu = Get-CimInstance Win32_PerfFormattedData_PerfOS_Processor -Filter "Name='_Total'"
-    $memory = Get-CimInstance Win32_PerfFormattedData_PerfOS_Memory
-    $io = Get-CimInstance Win32_PerfFormattedData_PerfDisk_LogicalDisk -Filter "Name='$($os.SystemDrive)'"
-    if ($null -eq $cpu.PercentProcessorTime -or $null -eq $memory.AvailableMBytes -or $null -eq $io.DiskBytesPersec) {
-        throw 'One or more performance counters are unavailable.'
+$perfRoot = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Perflib'
+$english = (Get-ItemProperty -LiteralPath "$perfRoot\009" -Name Counter).Counter
+$localized = (Get-ItemProperty -LiteralPath "$perfRoot\CurrentLanguage" -Name Counter).Counter
+$localByIndex = @{}
+for ($i = 0; $i + 1 -lt $localized.Count; $i += 2) {
+    $localByIndex[$localized[$i]] = $localized[$i + 1]
+}
+function Resolve-CounterName([string]$Name) {
+    for ($index = 1; $index -lt $english.Count; $index += 2) {
+        if ($english[$index] -eq $Name) {
+            $localName = $localByIndex[$english[$index - 1]]
+            if ($localName) { return $localName }
+        }
     }
-    [pscustomobject]@{
-        CpuPercent = $cpu.PercentProcessorTime
-        FreeRAMMiB = $memory.AvailableMBytes
-        DiskBytesPerSecond = $io.DiskBytesPersec
-    }
-    if ($i -lt ($Seconds - 1)) { Start-Sleep -Seconds 1 }
-})
+    throw "Windows performance counter is unavailable: $Name."
+}
+$cpuPath = '\{0}(_Total)\{1}' -f (Resolve-CounterName 'Processor'), (Resolve-CounterName '% Processor Time')
+$ramPath = '\{0}\{1}' -f (Resolve-CounterName 'Memory'), (Resolve-CounterName 'Available MBytes')
+$diskPath = '\{0}({1})\{2}' -f (Resolve-CounterName 'LogicalDisk'), $os.SystemDrive, (Resolve-CounterName 'Disk Bytes/sec')
+$paths = @($cpuPath, $ramPath, $diskPath)
+$collected = 0
+$measurement = [Diagnostics.Stopwatch]::StartNew()
+if ($ShowProgress) { Write-Host 'Opening Windows performance counters...' }
+$samples = @(Get-Counter -Counter $paths -SampleInterval 1 -MaxSamples $Seconds -ErrorAction Stop |
+    ForEach-Object {
+        $byPath = @{}
+        foreach ($counter in $_.CounterSamples) {
+            if ($counter.Status -notin @(0, 1) -or [double]::IsNaN($counter.CookedValue)) {
+                throw "Windows performance counter failed: $($counter.Path) (status $($counter.Status))."
+            }
+            $relativePath = $counter.Path -replace '^\\\\[^\\]+', ''
+            $byPath[$relativePath] = $counter.CookedValue
+        }
+        foreach ($path in $paths) {
+            if (-not $byPath.ContainsKey($path)) { throw "Missing Windows performance counter: $path." }
+        }
+        $collected++
+        if ($ShowProgress -and ($collected -eq 1 -or $collected % 10 -eq 0 -or $collected -eq $Seconds)) {
+            Write-Host "Collected $collected/$Seconds samples ($([int]$measurement.Elapsed.TotalSeconds)s)."
+        }
+        [pscustomobject]@{
+            CpuPercent = $byPath[$cpuPath]
+            FreeRAMMiB = $byPath[$ramPath]
+            DiskBytesPerSecond = $byPath[$diskPath]
+        }
+    })
+if ($samples.Count -ne $Seconds) { throw "Expected $Seconds samples, got $($samples.Count)." }
 [pscustomobject]@{
     Computer = $env:COMPUTERNAME
     CapturedUtc = [DateTime]::UtcNow.ToString('o')
