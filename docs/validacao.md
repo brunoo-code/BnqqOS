@@ -44,3 +44,9 @@ de teste em SSD com backup e autorização específica.
   Use o WPR quando precisar atribuir uma diferença de boot a CPU ou disco.
 
 Referência: https://learn.microsoft.com/en-us/windows-hardware/test/wpt/optimizing-performance-and-responsiveness-exercise-2
+
+O comparador de PresentMon aceita os conjuntos --before e --after no
+script bench_frames.py. Use o mesmo --target-fps e janelas de captura
+equivalentes. O relatório guarda mediana, mínimo, máximo e os deltas
+de FPS médio, 1% low, p99 e proporção de quadros lentos. O comparador
+recusa CSV repetido e conjuntos com executáveis diferentes.
