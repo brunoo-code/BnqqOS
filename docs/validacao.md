@@ -21,3 +21,26 @@ com o mesmo tempo de repouso. Use Compare-BnqqOSBaseline.ps1 com
 No notebook, compare também Equilibrado e Alto desempenho, com a
 mesma fonte e condição térmica. A VM mede consumo em repouso. A
 medição de tempo de quadro e 1% low é feita no hardware físico.
+
+## Experimento Compact OS
+
+Use uma instalação limpa de teste. No PC atual, o SSD SATA tem uma
+partição D: em uso. Para validar o fluxo sem formatar, use um disco
+virtual dedicado. Para avaliar desempenho físico, use uma instalação
+de teste em SSD com backup e autorização específica.
+
+- Capture Before e After com Get-BnqqOSCompactTrial.ps1, em arquivos
+  separados, na mesma instalação. O coletor apenas consulta o estado
+  de compressão e mede 60 amostras de RAM, CPU e disco.
+- Use a mesma condição de boot em cada rodada. Se usar cronômetro
+  externo, informe BootMilliseconds medindo do mesmo ponto até a
+  área de trabalho pronta. Use GameLoadMilliseconds e GameScenario
+  para a mesma cena local, com o mesmo ponto de início e fim.
+- Faça pelo menos três rodadas por condição, mantendo a versão do
+  Windows, espaço de jogo, energia e atualizações equivalentes.
+  Compare as medianas de boot e carregamento. Use
+  Compare-BnqqOSBaseline.ps1 -SameVm para os deltas de repouso de cada par.
+- Confira o texto de CompactQuery de cada relatório antes de comparar.
+  Use o WPR quando precisar atribuir uma diferença de boot a CPU ou disco.
+
+Referência: https://learn.microsoft.com/en-us/windows-hardware/test/wpt/optimizing-performance-and-responsiveness-exercise-2
