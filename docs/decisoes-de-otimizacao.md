@@ -53,3 +53,29 @@ Ordem de implementação:
 5. **Validação competitiva.** Medir 1% lows e p99 no PC físico com temperatura e alimentação controladas. Guardar CSVs e informar a variação entre rodadas. Evitar ajustes globais de timer, rede, GPU ou BIOS sem teste no equipamento-alvo.
 
 Métodos: [Compact OS](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/compact-os), [orientação para disco rotacional](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/oem-deployment-of-windows-desktop-editions?view=windows-11), [WPR para CPU e disco](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/recording-for-resource-based-analysis).
+
+## Próxima rodada a partir da VM
+
+A opção 0 removeu sete apps, ativou o plano BNQQ e aplicou as
+preferências de navegador. O console registrou captura ativa, OneDrive,
+OneDriveSetup, abertura automática do Edge e o ícone de segurança do
+Windows. O diagnóstico de armazenamento virtual reportou zero bytes
+recuperados. A ordem abaixo usa esses fatos para selecionar os testes.
+
+| Área | Mudança candidata | Critério de aceite |
+| --- | --- | --- |
+| ISO e primeiro login | Adicionar Gravador de Voz, Hub de Feedback, Dev Home, To Do e Power Automate Desktop à lista offline. O Toolkit já confirmou que os cinco saem da conta na VM. Conferir quais estão provisionados no WIM alvo. | DISM remove somente os pacotes aprovados. Primeiro login, Store, WinGet, Windows Update e recuperação continuam funcionando. Informar os bytes economizados separadamente de FPS. |
+| Captura | Oferecer desligar a gravação em segundo plano a quem não usa clipes. Testar na configuração nativa de Capturas. A política geral de Game DVR e a preferência da conta têm escopos diferentes. | Clipes em segundo plano param quando escolhidos. Preservar gravação manual quando a configuração nativa permitir. Medir CPU, disco e p99 na mesma cena. |
+| Inicialização | Validar na VM o novo controle opcional do OneDrive. Comparar o logon com sincronização ativa e inativa. Conferir efeito das políticas de pré-carregamento do Edge já presentes no Apps Lite antes de mexer na entrada de inicialização. | Sem interromper sincronização em andamento. Restaurar o comando exato e comprovar que o app abre manualmente. A entrada SecurityHealth permanece disponível. |
+| Rede | Avaliar um limite para downloads automáticos da Otimização de Entrega em conexões lentas, com escolha de horário e taxa. | Comparar jitter e perda com uma transferência concorrente. Atualizações devem continuar baixando. Testar em separado downloads iniciados manualmente e de launchers. |
+| Serviços e pesquisa | Medir SysMain ligado e desligado em HD e SSD. Testar primeiro a exclusão de pastas de jogos da indexação ou a pausa temporária já disponível no Focus. Evitar desabilitar em bloco Spooler, Server e serviços Xbox. | Medir abertura a frio, CPU e disco. Confirmar pesquisa, impressão ou Game Pass se o perfil prometer suporte. Validar recuperação dos serviços no menu 8. |
+| Disco e RAM | Avaliar Compact OS em SSD pequeno como experimento. Preservar paginação gerenciada e compressão de memória. Usar o diagnóstico de margem de memória da opção 0 para identificar pressão. | Três boots por condição no mesmo SSD, com disco ocupado, tempo de boot e abertura da mesma cena. Verificar se a economia não vem com regressão de carregamento. |
+
+Para encontrar novos cortes, registrar CPU, disco, hard faults e rede com
+WPR em duas situações: repouso após login e o mesmo cenário de jogo.
+Comparar a condição oficial com BnqqOS e depois mudar uma variável por
+vez. A aprovação em VM verifica instalação, aplicação e restauração.
+A decisão de desempenho competitivo usa rodadas no PC físico, com
+medianas de 1% low e p99 e a dispersão de cada condição.
+
+Fontes: [Remoção de apps](https://learn.microsoft.com/en-us/windows/configuration/policy-based-inbox-app-removal/policy-based-inbox-app-removal), [Capturas e Game Mode](https://support.microsoft.com/en-us/accessibility/windows/understand-and-explore-windows-settings), [Inicialização](https://support.microsoft.com/en-gb/windows/experience/startup-boot/configure-startup-applications-in-windows), [Otimização de Entrega](https://learn.microsoft.com/en-us/windows/deployment/do/waas-delivery-optimization-reference), [Indexação](https://support.microsoft.com/en-us/windows/privacy/windows-search-and-privacy), [Serviços do Windows IoT Enterprise](https://learn.microsoft.com/en-us/windows/iot/iot-enterprise/optimize/services), [WPR](https://learn.microsoft.com/en-us/windows-hardware/test/wpt/recording-for-basic-system-diagnosis). As recomendações de serviços do IoT são referência de dependências e não uma lista de desativação para Windows Pro.
