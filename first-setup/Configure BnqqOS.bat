@@ -32,12 +32,14 @@ echo  [7] Inspect background services
 echo  [8] Open Game Mode settings
 echo  [9] Open full BNQQ Toolkit
 echo  [T] Windows theme settings
+echo  [R] Open optimizer reports
 echo.
 echo  [Q] Exit
 echo.
-choice /c 123456789T0Q /n /m "Select an option: "
+choice /c 123456789T0RQ /n /m "Select an option: "
 if errorlevel 255 exit /b 1
-if errorlevel 12 exit /b 0
+if errorlevel 13 exit /b 0
+if errorlevel 12 goto reports
 if errorlevel 11 goto optimize
 if errorlevel 10 goto theme
 if errorlevel 9 goto toolkit
@@ -182,6 +184,17 @@ exit /b 0
 :missingoptimizer
 echo The BNQQ Toolkit is not included in this build.
 goto back
+
+
+:reports
+set "reports=%LOCALAPPDATA%\BNQQ\data"
+if not exist "%reports%\" (
+    echo Run option 0 first to generate optimizer reports.
+    goto back
+)
+echo Look for optimizer-run-*.json and optional-apps-*.json.
+start "" explorer.exe "%reports%"
+goto menu
 
 
 :openlog

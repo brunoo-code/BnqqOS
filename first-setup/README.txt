@@ -6,6 +6,7 @@ BnqqOS | First setup
 2. Select Optimize Windows for gaming (0) and approve the Windows
    administrator prompt. Review the results in the console. Restart
    if the optimizer asks you to complete a change.
+   Select Open optimizer reports (R) to find the JSON reports.
 3. Select Prepare for gaming. The toolkit installs the Microsoft
    Visual C++ x64 and x86 runtimes for x64 Windows. Choose WinRAR,
    Chrome, and Steam as needed. The Riot option opens the official
