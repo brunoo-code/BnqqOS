@@ -2,12 +2,53 @@
   "name": "BnqqOS",
   "schemaVersion": 1,
   "candidates": [
-    { "displayName": "Clipchamp.Clipchamp", "reason": "Optional video editor" },
-    { "displayName": "Microsoft.BingNews", "reason": "Optional news app" },
-    { "displayName": "Microsoft.BingWeather", "reason": "Optional weather app" },
-    { "displayName": "Microsoft.MicrosoftSolitaireCollection", "reason": "Optional bundled game" },
-    { "displayName": "Microsoft.Copilot", "reason": "Optional Copilot app" },
-    { "displayName": "Microsoft.MicrosoftOfficeHub", "reason": "Optional Microsoft 365 hub" },
-    { "displayName": "Microsoft.OutlookForWindows", "reason": "Optional new Outlook app" }
+    {
+      "displayName": "Clipchamp.Clipchamp",
+      "reason": "Optional video editor"
+    },
+    {
+      "displayName": "Microsoft.BingNews",
+      "reason": "Optional news app"
+    },
+    {
+      "displayName": "Microsoft.BingWeather",
+      "reason": "Optional weather app"
+    },
+    {
+      "displayName": "Microsoft.MicrosoftSolitaireCollection",
+      "reason": "Optional bundled game"
+    },
+    {
+      "displayName": "Microsoft.Copilot",
+      "reason": "Optional Copilot app"
+    },
+    {
+      "displayName": "Microsoft.MicrosoftOfficeHub",
+      "reason": "Optional Microsoft 365 hub"
+    },
+    {
+      "displayName": "Microsoft.OutlookForWindows",
+      "reason": "Optional new Outlook app"
+    },
+    {
+      "displayName": "Microsoft.WindowsSoundRecorder",
+      "reason": "Optional voice recorder"
+    },
+    {
+      "displayName": "Microsoft.WindowsFeedbackHub",
+      "reason": "Optional feedback app"
+    },
+    {
+      "displayName": "Microsoft.Windows.DevHome",
+      "reason": "Optional developer dashboard"
+    },
+    {
+      "displayName": "Microsoft.Todos",
+      "reason": "Optional task list"
+    },
+    {
+      "displayName": "Microsoft.PowerAutomateDesktop",
+      "reason": "Optional desktop automation app"
+    }
   ]
 }
