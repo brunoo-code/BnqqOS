@@ -3,6 +3,7 @@
 param(
     [Parameter(Mandatory)][string]$RunDirectory,
     [Parameter(Mandatory)][string]$ToolkitExe,
+    [string[]]$RequiredRemovedApp,
     [switch]$VerifyIsoHash
 )
 $ErrorActionPreference = 'Stop'
@@ -13,6 +14,23 @@ if ($iso.Length -ne $manifest.BnqqOsIsoBytes) { throw 'ISO size differs from the
 if ($manifest.DefaultColorMode -ne 'WindowsDefault') { throw 'The image does not preserve the Windows color-mode default.' }
 if ($manifest.ToolkitExeSha256 -ne $toolkitHash) { throw 'The image contains a different Toolkit build.' }
 if ($manifest.BnqqOsIsoSha256 -notmatch '^[a-fA-F0-9]{64}$') { throw 'Invalid ISO checksum in the manifest.' }
+$before = @($manifest.Before)
+$after = @($manifest.After)
+$removed = @($manifest.Removed)
+if (-not $before.Count -or -not $after.Count -or -not $removed.Count) {
+    throw 'Missing package inventory in the release manifest.'
+}
+$expected = @($before | Where-Object { $_ -notin $removed } | Sort-Object)
+if (($expected -join "`n") -cne (($after | Sort-Object) -join "`n") -or
+    @($removed | Where-Object { $_ -notin $before }).Count) {
+    throw 'The package inventory does not match the declared removals.'
+}
+foreach ($app in $RequiredRemovedApp) {
+    $prefix = '^' + [regex]::Escape($app) + '_'
+    if (-not @($removed -match $prefix).Count -or @($after -match $prefix).Count) {
+        throw "Required app removal was not confirmed: $app."
+    }
+}
 if ($VerifyIsoHash -and (Get-FileHash -LiteralPath $iso.FullName -Algorithm SHA256).Hash -ne $manifest.BnqqOsIsoSha256) {
     throw 'ISO SHA-256 differs from the manifest.'
 }
@@ -23,5 +41,6 @@ if ($VerifyIsoHash -and (Get-FileHash -LiteralPath $iso.FullName -Algorithm SHA2
     IsoSha256Rechecked = [bool]$VerifyIsoHash
     ToolkitSha256 = $toolkitHash
     DefaultColorMode = $manifest.DefaultColorMode
-    RemovedPackages = @($manifest.Removed)
+    RemovedPackages = $removed
+    VerifiedRequiredApps = @($RequiredRemovedApp)
 }
