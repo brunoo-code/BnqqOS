@@ -7,6 +7,7 @@ param(
     [Parameter(Mandatory)][string]$RunDirectory,
     [ValidatePattern('^[0-9A-Fa-f]{64}$')][string]$ExpectedSha256,
     [string]$Edition = 'Windows 11 Pro',
+    [ValidatePattern('^[0-9A-Fa-f]{64}$')][string]$StagedWimSha256,
     [switch]$CreateVMs
 )
 
@@ -15,7 +16,20 @@ $ErrorActionPreference = 'Stop'
 $source = (Get-Item -LiteralPath $SourceIso).FullName
 $tool = (Get-Item -LiteralPath $Oscdimg).FullName
 $run = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($RunDirectory)
-if (Test-Path -LiteralPath $run) { throw 'Choose a new run directory.' }
+$reuseStagedExport = [bool]$StagedWimSha256
+if ($reuseStagedExport) {
+    foreach ($file in 'install.wim', 'media\sources\boot.wim', 'media\boot\etfsboot.com', 'media\efi\microsoft\boot\efisys.bin') {
+        Get-Item -LiteralPath (Join-Path $run $file) -ErrorAction Stop | Out-Null
+    }
+    if (Test-Path -LiteralPath (Join-Path $run 'BnqqOS.iso')) {
+        throw 'The staging directory already contains a completed ISO.'
+    }
+    if (@(Get-ChildItem -LiteralPath (Join-Path $run 'mount') -Force).Count -ne 0) {
+        throw 'The existing WIM mount directory is not empty.'
+    }
+} elseif (Test-Path -LiteralPath $run) {
+    throw 'Choose a new run directory.'
+}
 
 if ($CreateVMs) {
     $vmNames = @('BnqqOS-Control', 'BnqqOS')
@@ -25,28 +39,37 @@ if ($CreateVMs) {
         }
     }
 }
-New-Item -Path $run -ItemType Directory | Out-Null
-$media = New-Item -Path (Join-Path $run 'media') -ItemType Directory
-$mount = New-Item -Path (Join-Path $run 'mount') -ItemType Directory
+if ($reuseStagedExport) {
+    $media = Get-Item -LiteralPath (Join-Path $run 'media')
+    $mount = Get-Item -LiteralPath (Join-Path $run 'mount')
+    $logName = 'build-resume.log'
+} else {
+    New-Item -Path $run -ItemType Directory | Out-Null
+    $media = New-Item -Path (Join-Path $run 'media') -ItemType Directory
+    $mount = New-Item -Path (Join-Path $run 'mount') -ItemType Directory
+    $logName = 'build.log'
+}
 $bnqqIso = Join-Path $run 'BnqqOS.iso'
-Start-Transcript -Path (Join-Path $run 'build.log') | Out-Null
+Start-Transcript -Path (Join-Path $run $logName) -Append | Out-Null
 try {
     $sourceHash = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash
     if ($ExpectedSha256 -and $sourceHash -ne $ExpectedSha256) {
         throw 'Source ISO SHA-256 differs from the expected Microsoft hash.'
     }
-    $disk = Get-DiskImage -ImagePath $source
-    $attachedHere = -not $disk.Attached
-    try {
-        if ($attachedHere) { $disk = Mount-DiskImage -ImagePath $source -PassThru }
-        $volume = $disk | Get-Volume
-        if (-not $volume.DriveLetter) { throw 'ISO has no mounted drive letter.' }
-        $mediaRoot = "$($volume.DriveLetter):\"
-        & robocopy.exe $mediaRoot $media.FullName /E /R:1 /W:1 /NP
-        if ($LASTEXITCODE -ge 8) { throw "Robocopy failed ($LASTEXITCODE)." }
-    } finally {
-        if ($attachedHere -and (Get-DiskImage -ImagePath $source).Attached) {
-            Dismount-DiskImage -ImagePath $source | Out-Null
+    if (-not $reuseStagedExport) {
+        $disk = Get-DiskImage -ImagePath $source
+        $attachedHere = -not $disk.Attached
+        try {
+            if ($attachedHere) { $disk = Mount-DiskImage -ImagePath $source -PassThru }
+            $volume = $disk | Get-Volume
+            if (-not $volume.DriveLetter) { throw 'ISO has no mounted drive letter.' }
+            $mediaRoot = "$($volume.DriveLetter):\"
+            & robocopy.exe $mediaRoot $media.FullName /E /R:1 /W:1 /NP
+            if ($LASTEXITCODE -ge 8) { throw "Robocopy failed ($LASTEXITCODE)." }
+        } finally {
+            if ($attachedHere -and (Get-DiskImage -ImagePath $source).Attached) {
+                Dismount-DiskImage -ImagePath $source | Out-Null
+            }
         }
     }
 
@@ -64,7 +87,13 @@ try {
     if (-not $release) { $release = "Build $build" }
     $imageName = "BnqqOS $($Edition -replace '^Windows 11', 'Win11') $release"
     $wim = Join-Path $run 'install.wim'
-    Export-WindowsImage -SourceImagePath $install[0].FullName -SourceIndex $image[0].ImageIndex -DestinationImagePath $wim -DestinationName $imageName -CompressionType Max -CheckIntegrity | Out-Null
+    if ($reuseStagedExport) {
+        if ((Get-FileHash -LiteralPath $wim -Algorithm SHA256).Hash -ne $StagedWimSha256) {
+            throw 'The staged WIM does not match the expected export hash.'
+        }
+    } else {
+        Export-WindowsImage -SourceImagePath $install[0].FullName -SourceIndex $image[0].ImageIndex -DestinationImagePath $wim -DestinationName $imageName -CompressionType Max -CheckIntegrity | Out-Null
+    }
     $readMetadata = Join-Path $PSScriptRoot 'Get-BnqqOSWimMetadata.ps1'
     $sourceMetadata = @(& $readMetadata -Path $install[0].FullName | Where-Object Index -eq $image[0].ImageIndex)
     $exportedImages = @(& $readMetadata -Path $wim)
@@ -74,7 +103,6 @@ try {
         $exportedImages[0].EditionId -ne $sourceMetadata[0].EditionId) {
         throw 'The exported image index, name or Windows edition did not match.'
     }
-    Remove-Item -LiteralPath $install[0].FullName -Force
 
     Mount-WindowsImage -ImagePath $wim -Index 1 -Path $mount.FullName -CheckIntegrity | Out-Null
     $committed = $false
@@ -121,6 +149,7 @@ try {
         if (-not $committed) { Dismount-WindowsImage -Path $mount.FullName -Discard | Out-Null }
     }
 
+    Remove-Item -LiteralPath $install[0].FullName -Force
     Move-Item -LiteralPath $wim -Destination (Join-Path $sources 'install.wim')
     $bios = Join-Path $media.FullName 'boot\etfsboot.com'
     $uefi = Join-Path $media.FullName 'efi\microsoft\boot\efisys.bin'

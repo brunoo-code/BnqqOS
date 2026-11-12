@@ -13,3 +13,5 @@ A coleta anterior na VM BnqqOS-Setup-Test veio de uma instalação que tinha Win
 A segunda tentativa copiou a mídia e exportou o WIM, mas parou na validação antes de montar a imagem. A leitura do XML confirmou uma entrada de índice 1, com nome interno BnqqOS Win11 Pro 26H2, edição Professional e nome de exibição Windows 11 Pro. A fonte tinha Windows 11 Pro no índice 6 e edição Professional. O gerador agora valida o índice, a edição e o nome interno diretamente no XML.
 
 A leitura foi testada com os dois arquivos reais. A execução completa da correção ainda depende de uma sessão administrativa para montar o WIM, ajustar o perfil inicial, gerar a ISO e preparar as VMs. O primeiro login e as medições comparativas permanecem pendentes.
+
+A retomada pode usar a mídia já copiada e o WIM já exportado, com os hashes SHA-256 registrados no laboratório. O gerador confere o hash do WIM, o nome e a edição antes de montar a imagem e mantém o arquivo de instalação da mídia de trabalho até concluir a edição do WIM.
