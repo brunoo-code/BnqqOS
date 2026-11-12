@@ -119,6 +119,15 @@ try {
         if (($expected -join "`n") -ne ($actual -join "`n")) {
             throw 'Unexpected package difference. Discarding image changes.'
         }
+        $project = Split-Path $PSScriptRoot -Parent
+        $publicDesktop = Join-Path $mount.FullName 'Users\Public\Desktop'
+        $wallpaperDirectory = Join-Path $mount.FullName 'Windows\Web\Wallpaper\BnqqOS'
+        New-Item -ItemType Directory -Path $publicDesktop, $wallpaperDirectory -Force | Out-Null
+        foreach ($file in 'Configure BnqqOS.bat', 'README.txt') {
+            Copy-Item -LiteralPath (Join-Path $project "first-setup\$file") -Destination $publicDesktop -Force
+        }
+        Copy-Item -LiteralPath (Join-Path $project 'assets\branding\bnqqos-wallpaper-3840x2160.jpg') -Destination (Join-Path $wallpaperDirectory 'wallpaper.jpg') -Force
+
         # Seed the user template before Windows creates the first account.
         $profileHive = Join-Path $mount.FullName 'Users\Default\NTUSER.DAT'
         if (-not (Test-Path -LiteralPath $profileHive -PathType Leaf)) {
@@ -129,6 +138,11 @@ try {
         & reg.exe load $hive $profileHive
         if ($LASTEXITCODE -ne 0) { throw 'Could not load the offline default user profile.' }
         try {
+            $desktopKey = "$hive\Control Panel\Desktop"
+            & reg.exe add $desktopKey /v Wallpaper /t REG_EXPAND_SZ /d '%SystemRoot%\Web\Wallpaper\BnqqOS\wallpaper.jpg' /f
+            if ($LASTEXITCODE -ne 0) { throw 'Could not set the default wallpaper.' }
+            & reg.exe add $desktopKey /v WallpaperStyle /t REG_SZ /d 10 /f
+            if ($LASTEXITCODE -ne 0) { throw 'Could not set the default wallpaper style.' }
             $themeKey = "$hive\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
             foreach ($setting in 'SystemUsesLightTheme', 'AppsUseLightTheme') {
                 & reg.exe add $themeKey /v $setting /t REG_DWORD /d 0 /f

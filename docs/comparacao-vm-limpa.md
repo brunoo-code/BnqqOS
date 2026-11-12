@@ -27,3 +27,5 @@ O disco BNQQ_AB contém o coletor atualizado. Ele registra a preferência de cor
 - Pacotes removidos da imagem BnqqOS: Clipchamp, Bing News, Bing Weather e Microsoft Solitaire Collection.
 
 O Hyper-V confirmou a configuração equivalente nas VMs BnqqOS-Clean-Dark e Windows11-Clean-Control. A VM BnqqOS-Clean-Dark chegou ao aviso para iniciar pelo DVD virtual, mas a janela foi aberta após o prazo do aviso e o firmware tentou iniciar pela rede. O primeiro login e as medições comparativas permanecem pendentes.
+
+Em 12/11/2026, a VM renomeada para BnqqOS-Teste chegou ao primeiro desktop depois da atualização durante a configuração inicial. A barra de tarefas apareceu clara e o fundo exibiu o Windows Spotlight. O modo escuro inicial não passou na verificação visual. O gerador agora inclui o painel e o README no Desktop público e grava o caminho do papel de parede da BnqqOS no perfil padrão. Essas mudanças ainda precisam de uma nova instalação para validação.
