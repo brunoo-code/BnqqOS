@@ -14,3 +14,19 @@ O painel inclui consultas de energia e serviços, além de atalhos para as confi
 Validar a instalação, a navegação do painel e os estados dos serviços na VM. Ganhos de desempenho em jogo e compatibilidade com os anti-cheats devem ser avaliados no PC de teste físico.
 
 A opção 9 abre o executável completo do BNQQ Toolkit. Para incluir o binário na imagem, passe o caminho de BNQQ_Optimizer.exe em -ToolkitExe ao rodar New-BnqqOS.ps1. O SHA-256 do binário copiado consta no manifest.json. Em uma mídia de teste, o painel também aceita BNQQ_Optimizer.exe ao lado do .bat.
+
+## Limpeza de apps da conta e diagnóstico de inicialização
+
+O Toolkit no commit `ca732b8` inclui Gravador de Voz, Hub de Feedback,
+Dev Home, To Do e Power Automate Desktop na lista de remoção da opção 0.
+Copilot já fazia parte da lista. A remoção consulta novamente cada pacote
+e registra um relatório JSON por execução na conta atual. O teste
+simulado confirmou os estados removido, ausente e falhou.
+
+A opção 0 também mostra os itens de inicialização e lê a preferência
+atual de captura. Esses dados serão usados para decidir quais ajustes
+de segundo plano devem ter aplicação e restauração próprias.
+
+O DVD `BNQQ_APPS_QA` foi anexado à VM `BnqqOS-Teste`. O teste real
+depende da execução de `Run BNQQ Option 0.cmd` dentro da sessão da VM.
+Nenhuma remoção real foi registrada até esta atualização.
