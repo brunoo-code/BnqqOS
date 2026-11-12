@@ -5,6 +5,9 @@
     { "displayName": "Clipchamp.Clipchamp", "reason": "Optional video editor" },
     { "displayName": "Microsoft.BingNews", "reason": "Optional news app" },
     { "displayName": "Microsoft.BingWeather", "reason": "Optional weather app" },
-    { "displayName": "Microsoft.MicrosoftSolitaireCollection", "reason": "Optional bundled game" }
+    { "displayName": "Microsoft.MicrosoftSolitaireCollection", "reason": "Optional bundled game" },
+    { "displayName": "Microsoft.Copilot", "reason": "Optional Copilot app" },
+    { "displayName": "Microsoft.MicrosoftOfficeHub", "reason": "Optional Microsoft 365 hub" },
+    { "displayName": "Microsoft.OutlookForWindows", "reason": "Optional new Outlook app" }
   ]
 }
