@@ -14,7 +14,7 @@ A imagem parte da mídia oficial e preserva o modo de cores do Windows.
 | 6. Navegadores e inicialização | Reduzir pré-carregamento, inventariar entradas e oferecer OneDrive reversível. | Apps Lite aplicado na VM. Validar OneDrive no próximo login e confirmar recuperação. |
 | 7. Captura, tela e entrada | Diagnóstico de captura e taxa de atualização. Ajuste reversível do ponteiro. | Ponteiro aplicado na VM. Testar gravação em segundo plano com a mesma cena e preservar escolha de clipes. |
 | 8. Serviços e indexação | Desativar serviços selecionados e permitir restauração. | SysMain e telefonia aplicados na VM. Comparar SysMain em HD e SSD antes de ampliar a lista. |
-| 9. Disco e memória | Manutenção nativa, diagnóstico de pressão de RAM e Compact OS experimental. | Compact OS só para ensaio em SSD. Comparar espaço, boot e abertura de jogo antes de adotar. |
+| 9. Disco e memória | Manutenção nativa, diagnóstico de pressão de RAM e Compact OS experimental. | A versão seguinte do Toolkit evita repetir a manutenção bem-sucedida por sete dias (2f4ef5e). Compact OS segue em ensaio para SSD. |
 | 10. Rede | Diagnóstico e experimento com downloads automáticos em segundo plano. | Próximo experimento. Medir jitter e perda com tráfego concorrente e verificar Windows Update. |
 | 11. Recuperação e registros | Menu compacto, backups por área e relatórios por etapa. | Implementado. Testes do menu e seleção de backups passaram. |
 | 12. Qualificação | Verificação da ISO e comparações independentes em VM e PC físico. | Verificador de lançamento automatizado. Ganho de desempenho depende de medições repetidas, com 1% low e p99. |
