@@ -37,3 +37,11 @@ A BnqqOS iniciou pela ISO, concluiu a instalação e chegou à área de trabalho
 - SHA-256 conferido do Toolkit embutido: 72E37E7C3CBE744ED9747E5F8BC754BB904C5E9CA26D02E40C8FE885C57D31D1 (commit 7b4336d).
 - O perfil padrão do Windows foi preservado. Na imagem montada, o painel mostrou R para abrir os relatórios.
 - O DVD BNQQ_RELEASE_QA foi anexado à BnqqOS-Teste. O teste interativo e as medições antes/depois ainda aguardam execução dentro da VM.
+
+## Validação do plano de energia na VM
+
+Na BnqqOS-Teste, o operador testou o Toolkit do commit `7e24e05`
+pelo DVD BNQQ_POWER_QA. A opção 0 ativou o perfil derivado do BNQQ
+Competitive original e o menu 31 restaurou o plano ativo anterior.
+O teste verificou ativação e restauração. Não incluiu medição de FPS,
+temperatura ou consumo elétrico.
