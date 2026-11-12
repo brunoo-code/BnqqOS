@@ -10,19 +10,36 @@ set "log=%logdir%\setup.log"
 :menu
 cls
 echo ============================================================
-echo  BNQQOS   /   SETUP TOOLKIT
+echo   ____  _   _  ___   ___   ___  ____
+echo  ^| __ )^| \ ^| ^|/ _ \ / _ \ / _ \/ ___^|
+echo  ^|  _ \^|  \^| ^| ^| ^| ^| ^| ^| ^| ^| ^| \___ \
+echo  ^| ^|_) ^| ^|\  ^| ^|_^| ^| ^|_^| ^| ^|_^| ^|___) ^|
+echo  ^|____/^|_^| \_^|\__\_\\__\_\\___/^|____/
+echo  BnqqOS / First Setup
 echo ============================================================
 echo.
+echo  FIRST SETUP
 echo  [1] Prepare for gaming
 echo  [2] Windows Update and optional drivers
 echo  [3] Windows activation
 echo  [4] Identify graphics hardware
 echo  [5] Open setup log
+echo.
+echo  SYSTEM CHECKS
+echo  [6] Review power plans
+echo  [7] Inspect background services
+echo  [8] Open Game Mode settings
+echo  [9] Open full BNQQ Toolkit
+echo.
 echo  [0] Exit
 echo.
-choice /c 123450 /n /m "Select an option: "
+choice /c 1234567890 /n /m "Select an option: "
 if errorlevel 255 exit /b 1
-if errorlevel 6 exit /b 0
+if errorlevel 10 exit /b 0
+if errorlevel 9 goto toolkit
+if errorlevel 8 goto gamemode
+if errorlevel 7 goto services
+if errorlevel 6 goto power
 if errorlevel 5 goto openlog
 if errorlevel 4 goto gpu
 if errorlevel 3 goto activation
@@ -100,6 +117,39 @@ goto menu
 powershell.exe -NoProfile -Command "Get-CimInstance Win32_VideoController | Format-Table Name, DriverVersion -AutoSize"
 echo Use Windows Update or your PC or graphics manufacturer's official support page.
 goto back
+
+:power
+echo.
+powercfg.exe /getactivescheme
+powercfg.exe /list
+echo.
+choice /c YN /n /m "Open Windows Power Options? [Y/N] "
+if errorlevel 2 goto menu
+start "" control.exe /name Microsoft.PowerOptions
+goto menu
+
+:services
+echo.
+powershell.exe -NoProfile -Command "Get-CimInstance Win32_Service -Filter \"Name='SysMain' OR Name='WSearch' OR Name='DiagTrack' OR Name='wuauserv' OR Name='WinDefend'\" | Sort-Object Name | Format-Table Name, DisplayName, StartMode, State -AutoSize"
+goto back
+
+:gamemode
+start "" ms-settings:gaming-gamemode
+goto menu
+
+:toolkit
+set "optimizer=%ProgramFiles%\BnqqOS\BNQQ_Optimizer.exe"
+if not exist "%optimizer%" set "optimizer=%~dp0BNQQ_Optimizer.exe"
+if not exist "%optimizer%" (
+    echo The full BNQQ Toolkit is not included in this build.
+    goto back
+)
+start "" "%optimizer%"
+if errorlevel 1 (
+    echo The BNQQ Toolkit did not start.
+    goto back
+)
+goto menu
 
 :openlog
 if exist "%log%" (

@@ -8,6 +8,7 @@ param(
     [ValidatePattern('^[0-9A-Fa-f]{64}$')][string]$ExpectedSha256,
     [string]$Edition = 'Windows 11 Pro',
     [ValidatePattern('^[0-9A-Fa-f]{64}$')][string]$StagedWimSha256,
+    [string]$ToolkitExe,
     [switch]$CreateVMs
 )
 
@@ -16,6 +17,15 @@ $ErrorActionPreference = 'Stop'
 $source = (Get-Item -LiteralPath $SourceIso).FullName
 $tool = (Get-Item -LiteralPath $Oscdimg).FullName
 $run = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($RunDirectory)
+$toolkit = $null
+$toolkitHash = $null
+if ($ToolkitExe) {
+    $toolkit = Get-Item -LiteralPath $ToolkitExe
+    if ($toolkit.PSIsContainer -or $toolkit.Extension -ne '.exe') {
+        throw 'ToolkitExe must point to the BNQQ Optimizer executable.'
+    }
+    $toolkitHash = (Get-FileHash -LiteralPath $toolkit.FullName -Algorithm SHA256).Hash
+}
 $reuseStagedExport = [bool]$StagedWimSha256
 if ($reuseStagedExport) {
     foreach ($file in 'install.wim', 'media\sources\boot.wim', 'media\boot\etfsboot.com', 'media\efi\microsoft\boot\efisys.bin') {
@@ -128,6 +138,15 @@ try {
         }
         Copy-Item -LiteralPath (Join-Path $project 'assets\branding\bnqqos-wallpaper-3840x2160.jpg') -Destination (Join-Path $wallpaperDirectory 'wallpaper.jpg') -Force
 
+        if ($toolkit) {
+            $toolkitDirectory = Join-Path $mount.FullName 'Program Files\BnqqOS'
+            New-Item -ItemType Directory -Path $toolkitDirectory -Force | Out-Null
+            $toolkitDestination = Join-Path $toolkitDirectory 'BNQQ_Optimizer.exe'
+            Copy-Item -LiteralPath $toolkit.FullName -Destination $toolkitDestination -Force
+            if ((Get-FileHash -LiteralPath $toolkitDestination -Algorithm SHA256).Hash -ne $toolkitHash) {
+                throw 'The staged BNQQ Toolkit executable failed its hash check.'
+            }
+        }
         # Seed the user template before Windows creates the first account.
         $profileHive = Join-Path $mount.FullName 'Users\Default\NTUSER.DAT'
         if (-not (Test-Path -LiteralPath $profileHive -PathType Leaf)) {
@@ -173,6 +192,7 @@ try {
     Move-Item -LiteralPath $temporaryIso -Destination $bnqqIso
     [ordered]@{
         DefaultColorMode = 'Dark'
+        ToolkitExeSha256 = $toolkitHash
         Edition = $Edition
         ImageName = $exportedImages[0].Name
         SourceIndex = $image[0].ImageIndex

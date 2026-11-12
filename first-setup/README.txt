@@ -16,3 +16,13 @@ BnqqOS | First setup
    Windows with your Windows 11 Pro license.
 6. Restart when Windows Update or an installer asks you to. Open
    Steam or Riot Client and sign in to install your games.
+
+System checks
+Use Review power plans to see the active plan and open Windows Power
+Options. Inspect background services shows their current state and
+startup mode. Game Mode opens the corresponding Windows settings.
+
+Full BNQQ Toolkit
+Select Open full BNQQ Toolkit for the original optimizer menu, when
+included in the build. Review each action before applying it. Use
+Recover previous state in the optimizer to review rollback options.
