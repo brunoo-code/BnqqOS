@@ -1,0 +1,10 @@
+*.iso
+*.wim
+*.esd
+*.vhd
+*.vhdx
+*.avhdx
+*.log
+__pycache__/
+build/
+build-*/
