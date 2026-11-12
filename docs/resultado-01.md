@@ -29,3 +29,11 @@ A BnqqOS iniciou pela ISO, concluiu a instalação e chegou à área de trabalho
 - O manifesto registra `WindowsDefault`. O gerador não grava preferência de tema no perfil padrão. A aparência real do primeiro login ainda precisa ser observada em uma instalação nova.
 - O hash do Toolkit embutido coincide com o executável do commit `1ad0fa0`: `6ECB6B0535EDC745D9B996FAF05C1865AD7DB7E03D3A3B9881E71066411991EB`.
 - A sessão PowerShell Direct foi rejeitada antes da medição. O DVD `BNQQ_GUEST_QA` foi anexado à VM `BnqqOS-Teste` após a geração da ISO. A coleta interativa ainda não produziu dados.
+
+## Build com Toolkit atualizado e relatórios
+
+- ISO local: C:\Users\bruno\Documents\BnqqOS-Lab\build-first-setup-eee0ca1\BnqqOS.iso (8518606848 bytes).
+- SHA-256 da ISO calculado pelo build: 6475FFACFAF6A23A536EF9B94AC3EF53649731191B544F66CAF92AB6164256E9.
+- SHA-256 conferido do Toolkit embutido: 72E37E7C3CBE744ED9747E5F8BC754BB904C5E9CA26D02E40C8FE885C57D31D1 (commit 7b4336d).
+- O perfil padrão do Windows foi preservado. Na imagem montada, o painel mostrou R para abrir os relatórios.
+- O DVD BNQQ_RELEASE_QA foi anexado à BnqqOS-Teste. O teste interativo e as medições antes/depois ainda aguardam execução dentro da VM.
