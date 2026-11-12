@@ -26,4 +26,4 @@ O disco BNQQ_AB contém o coletor atualizado. Ele registra a preferência de cor
 - ISO oficial com 9.047.330.816 bytes e SHA-256 `BD4307DF32BC8AF33B39CCECB1174AEB345386630F89A2B86C7A4E36B55EA650`.
 - Pacotes removidos da imagem BnqqOS: Clipchamp, Bing News, Bing Weather e Microsoft Solitaire Collection.
 
-O primeiro login e as medições comparativas permanecem pendentes.
+O Hyper-V confirmou a configuração equivalente nas VMs BnqqOS-Clean-Dark e Windows11-Clean-Control. A VM BnqqOS-Clean-Dark chegou ao aviso para iniciar pelo DVD virtual, mas a janela foi aberta após o prazo do aviso e o firmware tentou iniciar pela rede. O primeiro login e as medições comparativas permanecem pendentes.
