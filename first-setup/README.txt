@@ -19,7 +19,7 @@ BnqqOS | First setup
    activation. If needed, open Settings to use a valid Windows 11
    Pro product key or digital license.
    To change your appearance, select Windows theme settings and
-   choose Dark under Choose your mode.
+   select your preferred color mode.
 7. Restart when Windows Update or an installer asks you to. Open
    Steam or Riot Client and sign in to install your games.
 

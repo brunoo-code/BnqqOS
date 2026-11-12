@@ -18,7 +18,7 @@ Medir um ajuste por vez. Usar a VM para verificar instalação e funcionamento b
 
 ## Padrão visual da próxima imagem
 
-O BnqqOS deve iniciar com modo escuro para o Windows e os aplicativos compatíveis, transparência desativada, wallpaper fixo e avatar padrão. O DVD BNQQ_TEMA permite testar o tema escuro e a imagem de bloqueio na conta atual. Validar uma conta nova antes de integrar à imagem final. A tela de bloqueio do Windows Pro será testada como preferência por conta. O comportamento antes do primeiro login continua pendente.
+A instalação nova deve manter o modo de cores padrão do Windows. No primeiro login, verifique o papel de parede do BnqqOS, o painel na área de trabalho e a disponibilidade das opções de tema em Configurações.
 
 Os ajustes de desempenho serão medidos separadamente das preferências de aparência, com comparação contra o Windows oficial na mesma build.
 
