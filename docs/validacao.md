@@ -8,3 +8,16 @@
 4. **Repetição:** pelo menos cinco execuções válidas por condição e cenário, alternando A/B em blocos com ordem balanceada para reduzir viés térmico. Fixar janela de captura e critério de exclusão antes de iniciar. Divulgar dados por execução, mediana e dispersão; ganho menor do que a variação entre rodadas é inconclusivo.
 5. **Métricas separadas:** disco ocupado após atualizações, tempo de boot, RAM disponível/comprometida, CPU e disco em repouso. Em jogo, FPS médio, 1% low com definição publicada, p99 do tempo de quadro e frames acima do dobro do orçamento de tempo do FPS alvo. Usar [PresentMon](https://github.com/GameTechDev/PresentMon/blob/main/README-CaptureApplication.md) e guardar CSVs. Tempo de quadro não mede clique até a tela; só anunciar ganho de input lag com medição própria de clique até a imagem.
 6. **Aceite:** a primeira imagem precisa instalar e atualizar, preservar recuperação e passar nos testes de compatibilidade. Se liberar espaço sem alterar FPS, divulgar o resultado como instalação mais enxuta. Se houver perda de compatibilidade ou regressão consistente, identificar e reverter a mudança antes de recomendar a edição.
+
+## Teste da opção 0
+
+Depois das atualizações, tire um checkpoint da VM BnqqOS e deixe o
+sistema em repouso por cinco minutos. Capture o baseline e o inventário
+de otimização. Execute a opção 0 no painel Configure BnqqOS, registre o
+resultado e reinicie se solicitado. Repita as medições na mesma VM,
+com o mesmo tempo de repouso. Use Compare-BnqqOSBaseline.ps1 com
+-SameVm para obter os deltas e guarde o setup.log junto aos relatórios.
+
+No notebook, compare também Equilibrado e Alto desempenho, com a
+mesma fonte e condição térmica. A VM mede consumo em repouso. A
+medição de tempo de quadro e 1% low é feita no hardware físico.

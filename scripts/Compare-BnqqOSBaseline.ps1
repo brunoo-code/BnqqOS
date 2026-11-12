@@ -2,7 +2,8 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$ControlReport,
-    [Parameter(Mandatory)][string]$BnqqOSReport
+    [Parameter(Mandatory)][string]$BnqqOSReport,
+    [switch]$SameVm
 )
 
 $ErrorActionPreference = 'Stop'
@@ -22,7 +23,14 @@ foreach ($report in $control, $candidate) {
         throw 'Invalid or incomplete baseline measurement.'
     }
 }
-if ($control.Computer -eq $candidate.Computer) { throw 'Use reports from two distinct VMs.' }
+if ($SameVm) {
+    if ($control.Computer -ne $candidate.Computer) { throw 'Use reports from the same VM in SameVm mode.' }
+    if ([DateTimeOffset]$candidate.CapturedUtc -le [DateTimeOffset]$control.CapturedUtc) {
+        throw 'Capture the control report before applying the optimizer.'
+    }
+} elseif ($control.Computer -eq $candidate.Computer) {
+    throw 'Use reports from two distinct VMs, or use SameVm for an optimizer before/after comparison.'
+}
 foreach ($field in 'Edition', 'Build', 'CpuSamples', 'VisibleRAMMiB') {
     if ($control.$field -ne $candidate.$field) { throw "The VM reports disagree on $field." }
 }
@@ -37,6 +45,7 @@ foreach ($field in 'LogicalProcessors', 'DiskCapacityGiB') {
 $controlRam = $control.VisibleRAMMiB - $control.FreeRAMMiB
 $candidateRam = $candidate.VisibleRAMMiB - $candidate.FreeRAMMiB
 [ordered]@{
+    Comparison = if ($SameVm) { 'OptimizerBeforeAfter' } else { 'CleanIso' }
     Edition = $control.Edition
     Build = $control.Build
     CpuSamples = $control.CpuSamples

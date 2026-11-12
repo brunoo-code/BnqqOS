@@ -19,9 +19,10 @@ echo  BnqqOS / First Setup
 echo ============================================================
 echo.
 echo  FIRST SETUP
+echo  [0] Optimize Windows for gaming
 echo  [1] Prepare for gaming
 echo  [2] Windows Update and optional drivers
-echo  [3] Windows activation
+echo  [3] Windows activation status and settings
 echo  [4] Identify graphics hardware
 echo  [5] Open setup log
 echo.
@@ -30,12 +31,15 @@ echo  [6] Review power plans
 echo  [7] Inspect background services
 echo  [8] Open Game Mode settings
 echo  [9] Open full BNQQ Toolkit
+echo  [T] Windows theme settings
 echo.
-echo  [0] Exit
+echo  [Q] Exit
 echo.
-choice /c 1234567890 /n /m "Select an option: "
+choice /c 123456789T0Q /n /m "Select an option: "
 if errorlevel 255 exit /b 1
-if errorlevel 10 exit /b 0
+if errorlevel 12 exit /b 0
+if errorlevel 11 goto optimize
+if errorlevel 10 goto theme
 if errorlevel 9 goto toolkit
 if errorlevel 8 goto gamemode
 if errorlevel 7 goto services
@@ -110,7 +114,16 @@ start "" ms-settings:windowsupdate
 goto menu
 
 :activation
+echo.
+cscript.exe //NoLogo "%SystemRoot%\System32\slmgr.vbs" /xpr
+echo.
+choice /c YN /n /m "Open Windows Activation settings? [Y/N] "
+if errorlevel 2 goto menu
 start "" ms-settings:activation
+goto menu
+
+:theme
+start "" ms-settings:colors
 goto menu
 
 :gpu
@@ -137,19 +150,39 @@ goto back
 start "" ms-settings:gaming-gamemode
 goto menu
 
-:toolkit
-set "optimizer=%ProgramFiles%\BnqqOS\BNQQ_Optimizer.exe"
-if not exist "%optimizer%" set "optimizer=%~dp0BNQQ_Optimizer.exe"
-if not exist "%optimizer%" (
-    echo The full BNQQ Toolkit is not included in this build.
-    goto back
+:optimize
+call :findoptimizer
+if errorlevel 1 goto missingoptimizer
+start "" /wait "%optimizer%" optimize -PauseAfterOptimize
+set "result=%errorlevel%"
+echo [%date% %time%] Optimizer exit code %result%>>"%log%"
+if not "%result%"=="0" (
+    echo The optimizer reported pending steps or could not start. Review its output.
+) else (
+    echo Optimizer finished. Restart only if the optimizer requested it.
 )
+goto back
+
+:toolkit
+call :findoptimizer
+if errorlevel 1 goto missingoptimizer
 start "" "%optimizer%"
 if errorlevel 1 (
     echo The BNQQ Toolkit did not start.
     goto back
 )
 goto menu
+
+:findoptimizer
+set "optimizer=%ProgramFiles%\BnqqOS\BNQQ_Optimizer.exe"
+if not exist "%optimizer%" set "optimizer=%~dp0BNQQ_Optimizer.exe"
+if not exist "%optimizer%" exit /b 1
+exit /b 0
+
+:missingoptimizer
+echo The BNQQ Toolkit is not included in this build.
+goto back
+
 
 :openlog
 if exist "%log%" (
