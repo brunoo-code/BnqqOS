@@ -6,9 +6,19 @@ $disk = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='$($os.SystemDrive)'
 $computer = Get-CimInstance Win32_ComputerSystem
 $theme = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -ErrorAction SilentlyContinue
 $windowsOld = Test-Path -LiteralPath (Join-Path "$($os.SystemDrive)\" 'Windows.old')
-$cpu = @(for ($i = 0; $i -lt $Seconds; $i++) {
-    (Get-CimInstance Win32_PerfFormattedData_PerfOS_Processor -Filter "Name='_Total'").PercentProcessorTime
-    Start-Sleep -Seconds 1
+$samples = @(for ($i = 0; $i -lt $Seconds; $i++) {
+    $cpu = Get-CimInstance Win32_PerfFormattedData_PerfOS_Processor -Filter "Name='_Total'"
+    $memory = Get-CimInstance Win32_PerfFormattedData_PerfOS_Memory
+    $io = Get-CimInstance Win32_PerfFormattedData_PerfDisk_LogicalDisk -Filter "Name='$($os.SystemDrive)'"
+    if ($null -eq $cpu.PercentProcessorTime -or $null -eq $memory.AvailableMBytes -or $null -eq $io.DiskBytesPersec) {
+        throw 'One or more performance counters are unavailable.'
+    }
+    [pscustomobject]@{
+        CpuPercent = $cpu.PercentProcessorTime
+        FreeRAMMiB = $memory.AvailableMBytes
+        DiskBytesPerSecond = $io.DiskBytesPersec
+    }
+    if ($i -lt ($Seconds - 1)) { Start-Sleep -Seconds 1 }
 })
 [pscustomobject]@{
     Computer = $env:COMPUTERNAME
@@ -18,8 +28,10 @@ $cpu = @(for ($i = 0; $i -lt $Seconds; $i++) {
     VisibleRAMMiB = [math]::Round($os.TotalVisibleMemorySize / 1024)
     FreeRAMMiB = [math]::Round($os.FreePhysicalMemory / 1024)
     DiskUsedGiB = [math]::Round(($disk.Size - $disk.FreeSpace) / 1GB, 2)
-    CpuAveragePercent = [math]::Round(($cpu | Measure-Object -Average).Average, 2)
-    CpuSamples = $cpu.Count
+    CpuAveragePercent = [math]::Round(($samples | Measure-Object CpuPercent -Average).Average, 2)
+    FreeRAMAverageMiB = [math]::Round(($samples | Measure-Object FreeRAMMiB -Average).Average, 2)
+    DiskAverageBytesPerSecond = [math]::Round(($samples | Measure-Object DiskBytesPerSecond -Average).Average, 2)
+    CpuSamples = $samples.Count
     LogicalProcessors = $computer.NumberOfLogicalProcessors
     DiskCapacityGiB = [math]::Round($disk.Size / 1GB, 2)
     WindowsOldPresent = $windowsOld

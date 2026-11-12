@@ -53,15 +53,25 @@ $candidateRam = $candidate.VisibleRAMMiB - $candidate.FreeRAMMiB
         CpuAveragePercent = $control.CpuAveragePercent
         RamUsedMiB = $controlRam
         DiskUsedGiB = $control.DiskUsedGiB
+        FreeRAMAverageMiB = $control.FreeRAMAverageMiB
+        DiskAverageBytesPerSecond = $control.DiskAverageBytesPerSecond
     }
     BnqqOS = [ordered]@{
         CpuAveragePercent = $candidate.CpuAveragePercent
         RamUsedMiB = $candidateRam
         DiskUsedGiB = $candidate.DiskUsedGiB
+        FreeRAMAverageMiB = $candidate.FreeRAMAverageMiB
+        DiskAverageBytesPerSecond = $candidate.DiskAverageBytesPerSecond
     }
     DifferenceBnqqOSMinusControl = [ordered]@{
         CpuPercentagePoints = [math]::Round($candidate.CpuAveragePercent - $control.CpuAveragePercent, 2)
         RamMiB = $candidateRam - $controlRam
         DiskGiB = [math]::Round($candidate.DiskUsedGiB - $control.DiskUsedGiB, 2)
+        FreeRAMAverageMiB = if ($null -ne $control.FreeRAMAverageMiB -and $null -ne $candidate.FreeRAMAverageMiB) {
+            [math]::Round($candidate.FreeRAMAverageMiB - $control.FreeRAMAverageMiB, 2)
+        }
+        DiskAverageBytesPerSecond = if ($null -ne $control.DiskAverageBytesPerSecond -and $null -ne $candidate.DiskAverageBytesPerSecond) {
+            [math]::Round($candidate.DiskAverageBytesPerSecond - $control.DiskAverageBytesPerSecond, 2)
+        }
     }
 } | ConvertTo-Json -Depth 4
