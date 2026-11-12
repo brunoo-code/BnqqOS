@@ -162,15 +162,6 @@ try {
             if ($LASTEXITCODE -ne 0) { throw 'Could not set the default wallpaper.' }
             & reg.exe add $desktopKey /v WallpaperStyle /t REG_SZ /d 10 /f
             if ($LASTEXITCODE -ne 0) { throw 'Could not set the default wallpaper style.' }
-            $themeKey = "$hive\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-            foreach ($setting in 'SystemUsesLightTheme', 'AppsUseLightTheme') {
-                & reg.exe add $themeKey /v $setting /t REG_DWORD /d 0 /f
-                if ($LASTEXITCODE -ne 0) { throw "Could not write the dark-mode setting $setting." }
-                $value = & reg.exe query $themeKey /v $setting
-                if ($LASTEXITCODE -ne 0 -or ($value -join ' ') -notmatch 'REG_DWORD\s+0x0\s*$') {
-                    throw "Could not verify the dark-mode setting $setting."
-                }
-            }
         } finally {
             & reg.exe unload $hive
             if ($LASTEXITCODE -ne 0) { throw 'Could not unload the offline default user profile.' }
@@ -191,7 +182,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Oscdimg failed ($LASTEXITCODE)." }
     Move-Item -LiteralPath $temporaryIso -Destination $bnqqIso
     [ordered]@{
-        DefaultColorMode = 'Dark'
+        DefaultColorMode = 'WindowsDefault'
         ToolkitExeSha256 = $toolkitHash
         Edition = $Edition
         ImageName = $exportedImages[0].Name
