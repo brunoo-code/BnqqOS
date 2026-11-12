@@ -15,3 +15,5 @@ A segunda tentativa copiou a mídia e exportou o WIM, mas parou na validação a
 A leitura foi testada com os dois arquivos reais. A execução completa da correção ainda depende de uma sessão administrativa para montar o WIM, ajustar o perfil inicial, gerar a ISO e preparar as VMs. O primeiro login e as medições comparativas permanecem pendentes.
 
 A retomada pode usar a mídia já copiada e o WIM já exportado, com os hashes SHA-256 registrados no laboratório. O gerador confere o hash do WIM, o nome e a edição antes de montar a imagem e mantém o arquivo de instalação da mídia de trabalho até concluir a edição do WIM.
+
+O disco BNQQ_AB contém o coletor atualizado. Ele registra a preferência de cores da conta, os processadores lógicos, a capacidade do volume e a presença de Windows.old. O comparador recusa instalações com Windows.old e relatórios atuais com processadores ou capacidade diferentes. Os campos de tema complementam a inspeção visual da página Cores no primeiro login. A conferência da memória fixa no Hyper-V e das atualizações continua necessária.

@@ -14,6 +14,7 @@ foreach ($report in $control, $candidate) {
         'FreeRAMMiB', 'CpuAveragePercent', 'DiskUsedGiB') {
         if ($null -eq $report.$field) { throw "Missing baseline field: $field" }
     }
+    if ($report.WindowsOldPresent -eq $true) { throw 'A Windows.old folder makes this unsuitable for a clean comparison.' }
     if ($report.CpuSamples -lt 60 -or $report.VisibleRAMMiB -le 0 -or
         $report.FreeRAMMiB -lt 0 -or $report.FreeRAMMiB -gt $report.VisibleRAMMiB -or
         $report.CpuAveragePercent -lt 0 -or $report.CpuAveragePercent -gt 100 -or
@@ -24,6 +25,13 @@ foreach ($report in $control, $candidate) {
 if ($control.Computer -eq $candidate.Computer) { throw 'Use reports from two distinct VMs.' }
 foreach ($field in 'Edition', 'Build', 'CpuSamples', 'VisibleRAMMiB') {
     if ($control.$field -ne $candidate.$field) { throw "The VM reports disagree on $field." }
+}
+
+foreach ($field in 'LogicalProcessors', 'DiskCapacityGiB') {
+    if (($null -ne $control.$field -or $null -ne $candidate.$field) -and
+        $control.$field -ne $candidate.$field) {
+        throw "The VM reports disagree on $field."
+    }
 }
 
 $controlRam = $control.VisibleRAMMiB - $control.FreeRAMMiB
