@@ -12,3 +12,12 @@ O DISM confirmou a remoção de Clipchamp, Notícias, Clima e Solitaire. A difer
 Artefatos locais em `D:\BnqqOS-Lab\build-01`: BnqqOS.iso, manifest.json e build.log.
 
 A BnqqOS iniciou pela ISO, concluiu a instalação e chegou à área de trabalho, conforme confirmado pelo operador da VM. As medições pós-instalação dependem da instalação da VM de controle.
+
+## Build de primeiro uso de 12/11/2026
+
+- ISO: `D:\BnqqOS-Lab\build-first-setup-ab5fb13\BnqqOS.iso` (8.518.604.800 bytes).
+- SHA-256: `0FF05B552DE52FA8597BF3B2525F1B17F9D57397143122D483C2177D5B43B07B`.
+- Instalador: BnqqOS Win11 Pro 26H2. O build verificou os valores de tema escuro no perfil padrão e incluiu Configure BnqqOS com a opção 0.
+- DISM confirmou seis remoções: Clipchamp, Notícias, Clima, Solitaire, hub do Microsoft 365 e novo Outlook. O pacote independente do Copilot não estava provisionado na mídia de origem.
+- O Toolkit embutido é o do commit `1fa7b9f`, com SHA-256 `4BA5B768C4FFFAAF616169D690E13C631A8BBD03A8DAD512CFB8637E6294BF33`. Os ajustes de ponteiro, Widgets e bateria entraram no Toolkit após o início deste build.
+- PowerShell Direct rejeitou a credencial da VM antes do baseline. Nenhuma comparação de consumo ou execução da opção 0 na VM foi concluída nesta rodada. O boot e o primeiro login desta mídia também aguardam teste.
